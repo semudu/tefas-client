@@ -7,9 +7,6 @@ on:
     branches: [main]
   workflow_call:          # allow release workflow to reuse this
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
 jobs:
   lint:
     name: Lint & type check
@@ -22,12 +19,12 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: pyproject.toml
-      - name: Install dev dependencies
-        run: uv pip install --system -e ".[dev]"
+      - name: Sync dependencies
+        run: uv sync --extra dev
       - name: Ruff
-        run: ruff check src tests
+        run: uv run ruff check src tests
       - name: Mypy
-        run: mypy src
+        run: uv run mypy src
 
   test:
     name: Test / Python ${{ matrix.python-version }}
@@ -45,7 +42,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: pyproject.toml
           python-version: ${{ matrix.python-version }}
-      - name: Install dev dependencies
-        run: uv pip install --system -e ".[dev]"
+      - name: Sync dependencies
+        run: uv sync --extra dev
       - name: pytest
-        run: pytest --tb=short -q
+        run: uv run pytest --tb=short -q
