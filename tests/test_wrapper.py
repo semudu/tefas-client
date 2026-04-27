@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import json
+import warnings
+from contextlib import suppress
 from datetime import date
 from pathlib import Path
 
-import pytest
 from pytest_httpx import HTTPXMock
 
 from tefas_client import FundType, Tefas
@@ -117,14 +118,10 @@ class TestTefasFetch:
 
     def test_weekend_start_date_warns(self):
         """Passing a weekend start_date emits a UserWarning."""
-        from datetime import date as dt
-        import warnings
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             tefas = Tefas()
             # 2024-02-03 is a Saturday
-            try:
-                tefas.fetch("AAK", start_date=dt(2024, 2, 3), end_date=dt(2024, 2, 3), fund_type="YAT")
-            except Exception:
-                pass  # HTTP call will fail without mock; we only care about the warning
+            with suppress(Exception):
+                tefas.fetch("AAK", start_date=date(2024, 2, 3), end_date=date(2024, 2, 3), fund_type="YAT")
         assert any(issubclass(warning.category, UserWarning) for warning in w)

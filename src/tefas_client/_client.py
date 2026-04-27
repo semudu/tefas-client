@@ -15,7 +15,7 @@ from typing import Any
 
 import httpx
 
-from ._endpoints import REFERER_URL, BASE_URL, RequestBody
+from ._endpoints import BASE_URL, REFERER_URL, RequestBody
 from .exceptions import EmptyResponseError, RateLimitError, TefasError
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class TefasHttpClient:
     # Context manager
     # ------------------------------------------------------------------
 
-    def __enter__(self) -> "TefasHttpClient":
+    def __enter__(self) -> TefasHttpClient:
         self._client = httpx.Client(
             headers=_DEFAULT_HEADERS,
             timeout=self._timeout,

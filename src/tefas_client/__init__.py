@@ -24,8 +24,9 @@ __all__ = [
 
 __version__ = "1.0.0"
 try:
-    from importlib.metadata import PackageNotFoundError, version as _pkg_version
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as _pkg_version
 
     __version__ = _pkg_version("tefas-client")
-except Exception:  # pragma: no cover
+except PackageNotFoundError:  # pragma: no cover
     pass

@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from datetime import date
 
-import pytest
-
 from tefas_client._utils import chunk_date_range, dedupe, nearest_weekday
 
 

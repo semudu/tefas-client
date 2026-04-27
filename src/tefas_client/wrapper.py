@@ -64,7 +64,7 @@ class Tefas:
     # Context manager
     # ------------------------------------------------------------------
 
-    def __enter__(self) -> "Tefas":
+    def __enter__(self) -> Tefas:
         self._client = TefasHttpClient(timeout=self._timeout)
         self._client.__enter__()
         return self

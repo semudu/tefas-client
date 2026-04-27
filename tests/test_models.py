@@ -7,7 +7,7 @@ from datetime import date
 import pytest
 
 from tefas_client._endpoints import AllocationRow, InfoRow
-from tefas_client._models import Allocation, Fund, History
+from tefas_client._models import Fund, History
 
 
 class TestInfoRow:
@@ -133,5 +133,5 @@ class TestFund:
         assert fund.code == "AAK"
 
     def test_empty_history_raises(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             Fund(code="AAK", title="Test", history=[])

@@ -102,7 +102,7 @@ class Allocation(BaseModel):
     model_config = {"frozen": True}
 
     @classmethod
-    def from_row(cls, row: AllocationRow) -> "Allocation":
+    def from_row(cls, row: AllocationRow) -> Allocation:
         raw_assets = row.allocation_fields()
         names = {code: _ASSET_NAMES.get(code, code) for code in raw_assets}
         return cls(
@@ -131,7 +131,7 @@ class History(BaseModel):
     model_config = {"frozen": True}
 
     @classmethod
-    def from_row(cls, row: InfoRow, alloc: AllocationRow | None = None) -> "History":
+    def from_row(cls, row: InfoRow, alloc: AllocationRow | None = None) -> History:
         return cls(
             date=_parse_tefas_date(row.tarih),
             price=row.fiyat,
