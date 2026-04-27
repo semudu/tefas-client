@@ -38,10 +38,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/semudu/tefas-wrapper"
-Repository = "https://github.com/semudu/tefas-wrapper"
-"Bug Tracker" = "https://github.com/semudu/tefas-wrapper/issues"
-Changelog = "https://github.com/semudu/tefas-wrapper/releases"
+Homepage = "https://github.com/semudu/tefas-client"
+Repository = "https://github.com/semudu/tefas-client"
+"Bug Tracker" = "https://github.com/semudu/tefas-client/issues"
+Changelog = "https://github.com/semudu/tefas-client/releases"
 
 [tool.hatch.version]
 source = "vcs"
