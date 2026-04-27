@@ -1,8 +1,8 @@
-# tefas-wrapper v2
+# tefas-client
 
 Python client for fetching fund data from [TEFAS](https://www.tefas.gov.tr) (Türkiye Elektronik Fon Alım Satım Platformu).
 
-> **v2 is a complete rewrite.** The API is not backwards-compatible with v1.
+> **v1 API** is stable and focused on a simple synchronous client experience.
 
 ## Requirements
 
@@ -12,7 +12,7 @@ Python client for fetching fund data from [TEFAS](https://www.tefas.gov.tr) (Tü
 ## Installation
 
 ```bash
-pip install tefas-wrapper
+pip install tefas-client
 ```
 
 ## Quick start
@@ -116,14 +116,14 @@ Returns `dict[str, Fund]` — mapping of fund code to `Fund`.
 | **28-day window** | Each TEFAS request supports at most ~28 calendar days. `fetch()` splits larger ranges automatically. |
 | **Weekend/holiday dates** | TEFAS has no data for weekends. Date boundaries are automatically rolled back to the nearest Friday. |
 | **WAF restrictions** | The TEFAS WAF may block requests from datacenter IP ranges. Use a residential/VPN connection if you encounter persistent 403/503 errors. |
-| **No async** | v2 is synchronous-only. Async support is planned for a future release. |
+| **No async** | The client is synchronous-only. Async support is planned for a future release. |
 
 ## Development
 
 ```bash
-git clone https://github.com/semudu/tefas-wrapper
-cd tefas-wrapper
-make install   # pip install -e ".[dev]"
+git clone https://github.com/semudu/tefas-client
+cd tefas-client
+make install   # uv pip install -e ".[dev]"
 make test      # pytest
 make lint      # ruff + mypy
 make format    # ruff format + ruff --fix

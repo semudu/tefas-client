@@ -1,4 +1,4 @@
-"""tefas_client – TEFAS fund data client (v2).
+"""tefas_client – TEFAS fund data client (v1).
 
 Public API::
 
@@ -22,7 +22,7 @@ __all__ = [
     "EmptyResponseError",
 ]
 
-__version__ = "2.0.0"
+__version__ = "1.0.0"
 try:
     from importlib.metadata import PackageNotFoundError, version as _pkg_version
 
