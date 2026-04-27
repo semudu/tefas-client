@@ -1,17 +1,26 @@
+.PHONY: install test lint format build clean publish
+
+install:
+	uv pip install -e ".[dev]"
+
+test:
+	pytest
+
+lint:
+	ruff check src tests
+	mypy src
+
+format:
+	ruff format src tests
+	ruff check --fix src tests
+
+build: clean
+	hatch build
+
 clean:
-	# build
-	rm -rf build/
-	rm -rf dist/
-	rm -rf tefas_wrapper.egg-info/
-	rm -rf .eggs/
-	# pyc
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -rf {} +
+	rm -rf dist/ .mypy_cache .ruff_cache
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	find . -name "*.pyc" -delete
 
-build:
-	python setup.py sdist bdist_wheel
-
-upload:
-	twine upload dist/*
+publish: build
+	hatch publish
