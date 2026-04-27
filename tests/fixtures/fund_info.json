@@ -1,0 +1,28 @@
+{
+  "errorCode": 0,
+  "errorMessage": null,
+  "resultList": [
+    {
+      "fonKodu": "AAK",
+      "fonUnvan": "Ak Portfoy Amerikan Dolar Yabanci BYF",
+      "tarih": "2024-02-01",
+      "fiyat": 23.456789,
+      "portfoyBuyukluk": 1234567890.12,
+      "tedPaySayisi": 52678900.0,
+      "kisiSayisi": 14302,
+      "borsaBultenFiyat": 23.46,
+      "rn": 1
+    },
+    {
+      "fonKodu": "AAK",
+      "fonUnvan": "Ak Portfoy Amerikan Dolar Yabanci BYF",
+      "tarih": "2024-02-02",
+      "fiyat": 23.512345,
+      "portfoyBuyukluk": 1240000000.00,
+      "tedPaySayisi": 52800000.0,
+      "kisiSayisi": 14350,
+      "borsaBultenFiyat": 23.51,
+      "rn": 1
+    }
+  ]
+}
