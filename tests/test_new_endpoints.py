@@ -68,6 +68,22 @@ class TestFetchFundTypes:
         tefas = Tefas()
         assert tefas.fetch_fund_types() == []
 
+    def test_second_call_uses_cache(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(url=FUND_TYPES_URL, method="POST", json=_load("fund_types.json"))
+        tefas = Tefas()
+        first = tefas.fetch_fund_types()
+        second = tefas.fetch_fund_types()
+        assert first is second
+        assert len(httpx_mock.get_requests()) == 1
+
+    def test_refresh_bypasses_cache(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(url=FUND_TYPES_URL, method="POST", json=_load("fund_types.json"))
+        httpx_mock.add_response(url=FUND_TYPES_URL, method="POST", json=_load("fund_types.json"))
+        tefas = Tefas()
+        tefas.fetch_fund_types()
+        tefas.fetch_fund_types(refresh=True)
+        assert len(httpx_mock.get_requests()) == 2
+
 
 class TestFetchFounders:
     def test_returns_founder_list(self, httpx_mock: HTTPXMock):
@@ -90,6 +106,22 @@ class TestFetchFounders:
         tefas = Tefas()
         founders = tefas.fetch_founders()
         assert all(f.code == f.code.upper() for f in founders)
+
+    def test_second_call_uses_cache(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(url=FUND_FOUNDERS_URL, method="POST", json=_load("founders.json"))
+        tefas = Tefas()
+        first = tefas.fetch_founders()
+        second = tefas.fetch_founders()
+        assert first is second
+        assert len(httpx_mock.get_requests()) == 1
+
+    def test_refresh_bypasses_cache(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(url=FUND_FOUNDERS_URL, method="POST", json=_load("founders.json"))
+        httpx_mock.add_response(url=FUND_FOUNDERS_URL, method="POST", json=_load("founders.json"))
+        tefas = Tefas()
+        tefas.fetch_founders()
+        tefas.fetch_founders(refresh=True)
+        assert len(httpx_mock.get_requests()) == 2
 
 
 class TestLangParameter:

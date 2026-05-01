@@ -83,6 +83,8 @@ class Tefas:
         self._timeout = timeout
         self._lang = lang.upper()
         self._client: TefasHttpClient | None = None
+        self._fund_types_cache: dict[str, list[UmbrellaFundType]] = {}
+        self._founders_cache: dict[str, list[Founder]] = {}
 
     # ------------------------------------------------------------------
     # Context manager
@@ -208,14 +210,22 @@ class Tefas:
         row = FundOverviewRow.model_validate(rows[0])
         return FundOverview.from_row(row)
 
-    def fetch_fund_types(self, fund_type: FundType = "YAT") -> list[UmbrellaFundType]:
+    def fetch_fund_types(self, fund_type: FundType = "YAT", *, refresh: bool = False) -> list[UmbrellaFundType]:
         """List umbrella fund types (fonTurGetir).
+
+        Results are cached for the lifetime of this instance.  Pass
+        ``refresh=True`` to bypass the cache and fetch fresh data.
 
         Parameters
         ----------
         fund_type:
             ``"YAT"`` for investment funds (default) or ``"EMK"`` for pension.
+        refresh:
+            When *True*, ignore any cached result and fetch from the API.
         """
+        if not refresh and fund_type in self._fund_types_cache:
+            return self._fund_types_cache[fund_type]
+
         body = RequestBody(fonTipi=fund_type, dil=self._lang)
         if self._client is not None:
             rows = self._client.post(FUND_TYPES_URL, body)
@@ -229,16 +239,25 @@ class Tefas:
                 result.append(UmbrellaFundType.from_row(FundTypeRow.model_validate(raw)))
             except Exception:
                 logger.debug("Skipping malformed fund type row: %s", raw)
+        self._fund_types_cache[fund_type] = result
         return result
 
-    def fetch_founders(self, fund_type: FundType = "YAT") -> list[Founder]:
+    def fetch_founders(self, fund_type: FundType = "YAT", *, refresh: bool = False) -> list[Founder]:
         """List founder institutions (fonKurucuGetir).
+
+        Results are cached for the lifetime of this instance.  Pass
+        ``refresh=True`` to bypass the cache and fetch fresh data.
 
         Parameters
         ----------
         fund_type:
             ``"YAT"`` for investment funds (default) or ``"EMK"`` for pension.
+        refresh:
+            When *True*, ignore any cached result and fetch from the API.
         """
+        if not refresh and fund_type in self._founders_cache:
+            return self._founders_cache[fund_type]
+
         body = RequestBody(fonTipi=fund_type, dil=self._lang)
         if self._client is not None:
             rows = self._client.post(FUND_FOUNDERS_URL, body)
@@ -252,6 +271,7 @@ class Tefas:
                 result.append(Founder.from_row(FounderRow.model_validate(raw)))
             except Exception:
                 logger.debug("Skipping malformed founder row: %s", raw)
+        self._founders_cache[fund_type] = result
         return result
 
     # ------------------------------------------------------------------
