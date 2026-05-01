@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pytest_httpx import HTTPXMock
 
-from tefas_client import FundOverview, Founder, Tefas, UmbrellaFundType
+from tefas_client import Founder, FundOverview, Tefas, UmbrellaFundType
 from tefas_client._endpoints import FUND_FOUNDERS_URL, FUND_OVERVIEW_URL, FUND_TYPES_URL, INFO_URL
 
 FIXTURES = Path(__file__).parent / "fixtures"

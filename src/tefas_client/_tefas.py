@@ -50,7 +50,7 @@ from ._endpoints import (
     InfoRow,
     RequestBody,
 )
-from ._models import Fund, FundOverview, Founder, History, UmbrellaFundType
+from ._models import Founder, Fund, FundOverview, History, UmbrellaFundType
 from ._utils import chunk_date_range, dedupe, nearest_weekday
 
 logger = logging.getLogger(__name__)

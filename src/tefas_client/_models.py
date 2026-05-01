@@ -11,7 +11,7 @@ from typing import Any
 
 from pydantic import BaseModel, field_validator, model_validator
 
-from ._endpoints import AllocationRow, FundOverviewRow, FounderRow, FundTypeRow, InfoRow
+from ._endpoints import AllocationRow, FounderRow, FundOverviewRow, FundTypeRow, InfoRow
 
 # ---------------------------------------------------------------------------
 # Asset-code → human-readable name mapping
@@ -202,7 +202,7 @@ class FundOverview(BaseModel):
     model_config = {"frozen": True}
 
     @classmethod
-    def from_row(cls, row: FundOverviewRow) -> "FundOverview":
+    def from_row(cls, row: FundOverviewRow) -> FundOverview:
         return cls(
             code=row.fonKodu.strip().upper(),
             title=row.fonUnvan,
@@ -232,7 +232,7 @@ class UmbrellaFundType(BaseModel):
     model_config = {"frozen": True}
 
     @classmethod
-    def from_row(cls, row: FundTypeRow) -> "UmbrellaFundType":
+    def from_row(cls, row: FundTypeRow) -> UmbrellaFundType:
         return cls(code=row.sfonTuru, name=row.sfonTurAciklama)
 
 
@@ -251,7 +251,7 @@ class Founder(BaseModel):
     model_config = {"frozen": True}
 
     @classmethod
-    def from_row(cls, row: FounderRow) -> "Founder":
+    def from_row(cls, row: FounderRow) -> Founder:
         return cls(
             code=row.kurucuKodu.strip().upper(),
             name=row.kurucuUnvan,
