@@ -89,13 +89,15 @@ Snapshot method:
   - Raises EmptyResponseError if fund_code is invalid
 
 Discovery methods:
-- tefas.fetch_fund_types(fund_type: Literal["YAT", "EMK"] = "YAT") -> list[UmbrellaFundType]
+- tefas.fetch_fund_types(fund_type: Literal["YAT", "EMK"] = "YAT", *, refresh: bool = False) -> list[UmbrellaFundType]
   - Returns list of umbrella categories with code (int) and name (str)
   - Use returned code values as umbrella_type= in fetch()
+  - Results are cached per Tefas instance; pass refresh=True to force fresh fetch
 
-- tefas.fetch_founders(fund_type: Literal["YAT", "EMK"] = "YAT") -> list[Founder]
+- tefas.fetch_founders(fund_type: Literal["YAT", "EMK"] = "YAT", *, refresh: bool = False) -> list[Founder]
   - Returns list of founder institutions with code (str) and name (str)
   - Use returned code values as founder_code= in fetch()
+  - Results are cached per Tefas instance; pass refresh=True to force fresh fetch
 
 ## 5. Data objects returned
 
@@ -266,6 +268,7 @@ LLM guidance:
 - Add retry wait logic when suggesting batch workflows
 - For ETF funds, pass fund_type="BYF" explicitly or let auto-detect handle it
 - Use fetch_fund_types() and fetch_founders() first when user wants to filter results
+- Both methods cache results per instance; calling them multiple times is safe and cheap
 
 ## 9. Performance guidance for generated solutions
 
@@ -319,5 +322,6 @@ Keep examples production-safe:
 Based on README claims:
 - v2 API — production-ready and fully tested
 - New in v2: lang parameter, fund_type/umbrella_type/founder_code on fetch(), fetch_overview(), fetch_fund_types(), fetch_founders(), FundOverview/UmbrellaFundType/Founder models
+- fetch_fund_types() and fetch_founders() now cache results per instance with optional refresh=True parameter
 
 If project docs change, update this file to stay aligned with README.md.

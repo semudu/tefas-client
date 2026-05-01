@@ -16,7 +16,7 @@ Fetch fund prices, allocations, and metrics with a simple, synchronous API. Perf
 
 - **📊 Real-time data**: Fund prices (NAV), market cap, investor counts
 - **🔍 Portfolio breakdown**: Asset allocation across thousands of securities
-- **🗂️ Fund discovery**: List umbrella fund types and founder institutions
+- **🗂️ Fund discovery**: List umbrella fund types and founder institutions, with built-in caching
 - **📋 Fund snapshots**: Instant overview (price, daily return, category rank, market share)
 - **🌍 Language support**: Turkish (`TR`) and English (`EN`) responses
 - **🔎 Advanced filters**: Filter by umbrella type code or founder institution
@@ -300,18 +300,27 @@ with Tefas() as tefas:
 
 ---
 
-### `Tefas.fetch_fund_types(fund_type: "YAT" | "EMK" = "YAT") -> list[UmbrellaFundType]`
+### `Tefas.fetch_fund_types(fund_type: "YAT" | "EMK" = "YAT", *, refresh: bool = False) -> list[UmbrellaFundType]`
 
 List umbrella fund type codes and names. Pass the returned `code` values as `umbrella_type` in `fetch()`.
+
+Results are **cached per instance** — the second call returns the same list without hitting the API. Pass `refresh=True` to force a fresh request.
 
 ```python
 from tefas_client import Tefas
 
 with Tefas() as tefas:
-    types = tefas.fetch_fund_types()
+    types = tefas.fetch_fund_types()          # fetches from API
+    types = tefas.fetch_fund_types()          # returns cached result
+    types = tefas.fetch_fund_types(refresh=True)  # forces fresh fetch
     for t in types:
         print(t.code, t.name)  # e.g. 104 "Hisse Senedi Şemsiye Fonu"
 ```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `fund_type` | `"YAT" \| "EMK"` | `"YAT"` | Fund type to list categories for |
+| `refresh` | `bool` | `False` | When `True`, bypass cache and fetch fresh data |
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -320,26 +329,33 @@ with Tefas() as tefas:
 
 ---
 
-### `Tefas.fetch_founders(fund_type: "YAT" | "EMK" = "YAT") -> list[Founder]`
+### `Tefas.fetch_founders(fund_type: "YAT" | "EMK" = "YAT", *, refresh: bool = False) -> list[Founder]`
 
 List founder institution codes and names. Pass the returned `code` values as `founder_code` in `fetch()`.
+
+Results are **cached per instance** — the second call returns the same list without hitting the API. Pass `refresh=True` to force a fresh request.
 
 ```python
 from tefas_client import Tefas
 
 with Tefas() as tefas:
-    founders = tefas.fetch_founders()
+    founders = tefas.fetch_founders()          # fetches from API
+    founders = tefas.fetch_founders()          # returns cached result
+    founders = tefas.fetch_founders(refresh=True)  # forces fresh fetch
     for f in founders:
         print(f.code, f.name)  # e.g. "IPO" "İŞ PORTFÖY YÖNETİMİ A.Ş."
 ```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `fund_type` | `"YAT" \| "EMK"` | `"YAT"` | Fund type to list founders for |
+| `refresh` | `bool` | `False` | When `True`, bypass cache and fetch fresh data |
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `code` | `str` | Founder institution code |
 | `name` | `str` | Founder institution name |
 | `fund_type` | `str \| None` | Fund type indicator |
-
-**Returns:** `dict[str, Fund]` — mapping of fund code → fund data
 
 ### `Fund`
 
