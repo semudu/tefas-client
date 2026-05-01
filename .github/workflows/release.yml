@@ -17,10 +17,10 @@ jobs:
     needs: ci
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0          # hatch-vcs needs full git history for version
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v8.1.0
       - name: Install Hatch
         run: uv tool install hatch
       - name: Build wheel + sdist
