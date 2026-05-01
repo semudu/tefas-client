@@ -1,0 +1,21 @@
+{
+  "errorCode": 0,
+  "errorMessage": null,
+  "resultList": [
+    {
+      "kurucuKodu": "AKP",
+      "kurucuUnvan": "AK PORTFÖY YÖNETİMİ A.Ş.",
+      "fonTipi": "F"
+    },
+    {
+      "kurucuKodu": "IPO",
+      "kurucuUnvan": "İŞ PORTFÖY YÖNETİMİ A.Ş.",
+      "fonTipi": "F"
+    },
+    {
+      "kurucuKodu": "LAT",
+      "kurucuUnvan": "LATHE PORTFÖY YÖNETİMİ A.Ş.",
+      "fonTipi": "F"
+    }
+  ]
+}

@@ -20,6 +20,9 @@ BASE_URL = "https://www.tefas.gov.tr"
 REFERER_URL = f"{BASE_URL}/tr/fon-verileri"
 INFO_URL = f"{BASE_URL}/api/funds/fonGnlBlgSiraliGetir"
 ALLOCATION_URL = f"{BASE_URL}/api/funds/dagilimSiraliGetirT"
+FUND_OVERVIEW_URL = f"{BASE_URL}/api/funds/fonBilgiGetir"
+FUND_TYPES_URL = f"{BASE_URL}/api/funds/fonTurGetir"
+FUND_FOUNDERS_URL = f"{BASE_URL}/api/funds/fonKurucuGetir"
 
 # ---------------------------------------------------------------------------
 # Request body
@@ -34,9 +37,9 @@ class RequestBody(BaseModel):
     aramaMetni: str | None = None
     fonTurKod: str | None = None
     fonGrubu: str | None = None
-    sfonTurKod: str | None = None
-    basTarih: str  # YYYYMMDD
-    bitTarih: str  # YYYYMMDD
+    sfonTurKod: int | None = None
+    basTarih: str | None = None  # YYYYMMDD — optional for snapshot endpoints
+    bitTarih: str | None = None  # YYYYMMDD — optional for snapshot endpoints
     basSira: int = 1
     bitSira: int = 9999
     fonTurAciklama: str | None = None
@@ -120,3 +123,68 @@ class AllocationRow(BaseModel):
             except (TypeError, ValueError):
                 continue
         return result
+
+
+class FundOverviewRow(BaseModel):
+    """One row from /api/funds/fonBilgiGetir resultList — instant fund snapshot."""
+
+    fonKodu: str
+    fonUnvan: str
+    sonFiyat: float | None = None
+    gunlukGetiri: float | None = None
+    payAdet: int | None = None
+    portBuyukluk: float | None = None
+    fonKategori: str | None = None
+    kategoriDerece: int | None = None
+    kategoriFonSay: int | None = None
+    yatirimciSayi: int | None = None
+    pazarPayi: float | None = None
+
+    model_config = {"extra": "allow", "populate_by_name": True}
+
+    @field_validator("sonFiyat", "gunlukGetiri", "portBuyukluk", "pazarPayi", mode="before")
+    @classmethod
+    def coerce_float(cls, v: Any) -> float | None:
+        if v is None or v == "":
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    @field_validator("payAdet", "kategoriDerece", "kategoriFonSay", "yatirimciSayi", mode="before")
+    @classmethod
+    def coerce_int(cls, v: Any) -> int | None:
+        if v is None or v == "":
+            return None
+        try:
+            return int(float(v))
+        except (TypeError, ValueError):
+            return None
+
+
+class FundTypeRow(BaseModel):
+    """One row from /api/funds/fonTurGetir resultList — umbrella fund type."""
+
+    sfonTuru: int
+    sfonTurAciklama: str
+
+    model_config = {"extra": "allow", "populate_by_name": True}
+
+    @field_validator("sfonTuru", mode="before")
+    @classmethod
+    def coerce_int(cls, v: Any) -> int:
+        try:
+            return int(v)
+        except (TypeError, ValueError):
+            return 0
+
+
+class FounderRow(BaseModel):
+    """One row from /api/funds/fonKurucuGetir resultList — fund founder."""
+
+    kurucuKodu: str
+    kurucuUnvan: str
+    fonTipi: str | None = None
+
+    model_config = {"extra": "allow", "populate_by_name": True}

@@ -46,7 +46,8 @@ class TestTefasFetch:
         assert "yhs" in h.allocation.assets
 
     def test_fetch_empty_returns_empty_dict(self, httpx_mock: HTTPXMock):
-        # Auto-detect: tries YAT first (empty), then EMK fallback (also empty)
+        # Auto-detect: tries YAT → EMK → BYF, all empty
+        httpx_mock.add_response(url=INFO_URL, method="POST", json=_load("empty_response.json"))
         httpx_mock.add_response(url=INFO_URL, method="POST", json=_load("empty_response.json"))
         httpx_mock.add_response(url=INFO_URL, method="POST", json=_load("empty_response.json"))
         tefas = Tefas()
@@ -86,6 +87,16 @@ class TestTefasFetch:
         result = tefas.fetch("HHY", start_date=date(2024, 2, 1), end_date=date(2024, 2, 2))
         assert len(result) > 0
         assert len(httpx_mock.get_requests()) == 2
+
+    def test_auto_detect_byf_fund(self, httpx_mock: HTTPXMock):
+        """When YAT and EMK return nothing, auto-detect falls back to BYF."""
+        httpx_mock.add_response(url=INFO_URL, method="POST", json=_load("empty_response.json"))
+        httpx_mock.add_response(url=INFO_URL, method="POST", json=_load("empty_response.json"))
+        httpx_mock.add_response(url=INFO_URL, method="POST", json=_load("fund_info.json"))
+        tefas = Tefas()
+        result = tefas.fetch("GOLD", start_date=date(2024, 2, 1), end_date=date(2024, 2, 2))
+        assert len(result) > 0
+        assert len(httpx_mock.get_requests()) == 3
 
     def test_fetch_multiple_codes(self, httpx_mock: HTTPXMock):
         """A list of fund codes triggers one request per code."""

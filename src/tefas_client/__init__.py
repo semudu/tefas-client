@@ -1,15 +1,16 @@
-"""tefas_client – TEFAS fund data client (v1).
+"""tefas_client – TEFAS fund data client.
 
 Public API::
 
     from tefas_client import Tefas, Fund, History, Allocation
+    from tefas_client import FundOverview, UmbrellaFundType, Founder
 """
 
 from __future__ import annotations
 
-from ._models import Allocation, Fund, History
+from ._models import Allocation, Fund, FundOverview, Founder, History, UmbrellaFundType
 from .exceptions import EmptyResponseError, RateLimitError, TefasError
-from .wrapper import FundType, Tefas
+from ._tefas import FundType, Tefas
 
 __all__ = [
     "Tefas",
@@ -17,6 +18,9 @@ __all__ = [
     "Fund",
     "History",
     "Allocation",
+    "FundOverview",
+    "UmbrellaFundType",
+    "Founder",
     "TefasError",
     "RateLimitError",
     "EmptyResponseError",

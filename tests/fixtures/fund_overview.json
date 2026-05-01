@@ -1,0 +1,19 @@
+{
+  "errorCode": 0,
+  "errorMessage": null,
+  "resultList": [
+    {
+      "fonKodu": "IPB",
+      "fonUnvan": "İş Portföy Para Piyasası Fonu",
+      "sonFiyat": 1.234567,
+      "gunlukGetiri": 0.05,
+      "payAdet": 99000000,
+      "portBuyukluk": 5000000000.0,
+      "fonKategori": "Para Piyasası Fonu",
+      "kategoriDerece": 3,
+      "kategoriFonSay": 45,
+      "yatirimciSayi": 312000,
+      "pazarPayi": 2.15
+    }
+  ]
+}

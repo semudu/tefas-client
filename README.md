@@ -10,12 +10,16 @@
 
 Fetch fund prices, allocations, and metrics with a simple, synchronous API. Perfect for building financial dashboards, analysis tools, and investment tracking apps.
 
-> **Stable v1 API** — Production-ready, fully tested, zero breaking changes.
+> **v2 API** — Production-ready, fully tested, zero breaking changes.
 
 ## Features
 
 - **📊 Real-time data**: Fund prices (NAV), market cap, investor counts
-- **🔍 Portfolio breakdown**: Asset allocation across thousands of securities  
+- **🔍 Portfolio breakdown**: Asset allocation across thousands of securities
+- **🗂️ Fund discovery**: List umbrella fund types and founder institutions
+- **📋 Fund snapshots**: Instant overview (price, daily return, category rank, market share)
+- **🌍 Language support**: Turkish (`TR`) and English (`EN`) responses
+- **🔎 Advanced filters**: Filter by umbrella type code or founder institution
 - **⏱️ Smart chunking**: Automatic handling of TEFAS's 28-day query limits
 - **🛡️ Type-safe**: Full Pydantic validation, mypy compatible
 - **⚡ Resilient**: Exponential backoff, automatic weekend date handling
@@ -117,6 +121,70 @@ with Tefas() as tefas:
             print(f"{code}: {price}")
 ```
 
+### Fund overview: instant snapshot
+
+```python
+from tefas_client import Tefas
+
+with Tefas() as tefas:
+    ov = tefas.fetch_overview("IPB")
+    print(f"{ov.title}")
+    print(f"  Price     : {ov.price} TRY")
+    print(f"  Daily ret : {ov.daily_return}%")
+    print(f"  Rank      : {ov.category_rank}/{ov.category_fund_count} in {ov.category}")
+    print(f"  Investors : {ov.number_of_investors:,}")
+    print(f"  Mkt share : {ov.market_share}%")
+```
+
+### Discovery: list fund types and founders
+
+```python
+from tefas_client import Tefas
+
+with Tefas() as tefas:
+    # Umbrella fund type codes — use as umbrella_type= in fetch()
+    types = tefas.fetch_fund_types()
+    for t in types:
+        print(t.code, t.name)
+
+    # Founder codes — use as founder_code= in fetch()
+    founders = tefas.fetch_founders()
+    for f in founders:
+        print(f.code, f.name)
+```
+
+### Filtered fetch: umbrella type + founder
+
+```python
+from datetime import date
+from tefas_client import Tefas
+
+with Tefas() as tefas:
+    # Only equity umbrella funds (code 104) by a specific founder
+    funds = tefas.fetch(
+        fund_type="YAT",
+        umbrella_type=104,
+        founder_code="IPO",
+        start_date=date(2024, 2, 1),
+        end_date=date(2024, 2, 29),
+    )
+    for code, fund in funds.items():
+        print(code, fund.latest().price)
+```
+
+### English language responses
+
+```python
+from tefas_client import Tefas
+
+with Tefas(lang="EN") as tefas:
+    ov = tefas.fetch_overview("IPB")
+    print(ov.category)   # "Money Market Fund" instead of "Para Piyasası Fonu"
+
+    types = tefas.fetch_fund_types()
+    print(types[0].name) # English umbrella type names
+```
+
 ### Integration: Export to Pandas
 
 ```python
@@ -157,38 +225,119 @@ except RateLimitError as e:
 
 ## API reference
 
-### `Tefas(timeout: float = 30.0)`
+### `Tefas(timeout: float = 30.0, lang: str = "TR")`
 
 Context manager for managing HTTP connections and sessions.
 
 ```python
-with Tefas(timeout=15.0) as tefas:
+with Tefas(timeout=15.0, lang="EN") as tefas:
     funds = tefas.fetch("AAK", start_date=date.today(), end_date=date.today())
 ```
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `timeout` | `float` | `30.0` | Per-request HTTP timeout in seconds |
+| `lang` | `str` | `"TR"` | Response language: `"TR"` (Turkish) or `"EN"` (English) |
 
-### `Tefas.fetch(fund_code: str = "", *, start_date: date | None = None, end_date: date | None = None, include_allocation: bool = False) -> dict[str, Fund]`
+### `Tefas.fetch(...) -> dict[str, Fund]`
 
-Fetch fund data for a given date range.
+Fetch fund price history for a given date range. Large ranges are automatically split into ≤28-day chunks.
 
 ```python
 with Tefas() as tefas:
-    # Single fund
+    # Single fund — type auto-detected (YAT → EMK → BYF)
     funds = tefas.fetch("AAK", start_date=date(2024, 1, 1), end_date=date(2024, 3, 31))
-    
-    # All funds
+
+    # All investment funds
     all_funds = tefas.fetch(start_date=date.today(), end_date=date.today())
+
+    # Pension (BES) funds filtered by founder
+    funds = tefas.fetch(fund_type="EMK", founder_code="IPO", start_date=date(2024, 2, 1))
+
+    # Filter by umbrella type (e.g. equity funds = 104)
+    funds = tefas.fetch(fund_type="YAT", umbrella_type=104, start_date=date(2024, 2, 1))
 ```
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `fund_code` | `str` | `""` | TEFAS code (e.g. `"AAK"`). Empty = all funds |
+| `fund_code` | `str \| list[str]` | `""` | TEFAS code(s), e.g. `"AAK"` or `["AAK", "TLY"]`. Empty = all funds |
 | `start_date` | `date \| None` | `end_date` | Inclusive range start. Defaults to `end_date` |
-| `end_date` | `date \| None` | today | Inclusive range end. Automatically adjusted to nearest Friday if weekend/holiday |
+| `end_date` | `date \| None` | today | Inclusive range end. Auto-adjusted to nearest Friday if weekend |
 | `include_allocation` | `bool` | `False` | Include portfolio allocation breakdown |
+| `fund_type` | `"YAT" \| "EMK" \| "BYF" \| None` | `None` | Fund type. When `None` and a specific code is given, auto-detected via YAT → EMK → BYF |
+| `umbrella_type` | `int \| None` | `None` | Umbrella fund type code (e.g. `104`). Use `fetch_fund_types()` to list valid codes |
+| `founder_code` | `str \| None` | `None` | Founder institution code (e.g. `"IPO"`). Use `fetch_founders()` to list valid codes |
+
+**Returns:** `dict[str, Fund]` — mapping of fund code → fund data
+
+---
+
+### `Tefas.fetch_overview(fund_code: str) -> FundOverview`
+
+Fetch an instant snapshot of a single fund — current price, daily return, category ranking, and market share. Not a time-series; reflects the state at call time.
+
+```python
+from tefas_client import Tefas, FundOverview
+
+with Tefas() as tefas:
+    ov = tefas.fetch_overview("IPB")
+    print(f"{ov.title}: {ov.price} TRY, rank {ov.category_rank}/{ov.category_fund_count}")
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | `str` | TEFAS fund code |
+| `title` | `str` | Full fund name |
+| `price` | `float \| None` | Latest NAV in TRY |
+| `daily_return` | `float \| None` | Daily return percentage |
+| `shares` | `float \| None` | Total circulating shares |
+| `market_cap` | `float \| None` | Portfolio size in TRY |
+| `category` | `str \| None` | Fund category name |
+| `category_rank` | `int \| None` | Rank within category |
+| `category_fund_count` | `int \| None` | Total funds in category |
+| `number_of_investors` | `int \| None` | Active investor count |
+| `market_share` | `float \| None` | Market share percentage |
+
+---
+
+### `Tefas.fetch_fund_types(fund_type: "YAT" | "EMK" = "YAT") -> list[UmbrellaFundType]`
+
+List umbrella fund type codes and names. Pass the returned `code` values as `umbrella_type` in `fetch()`.
+
+```python
+from tefas_client import Tefas
+
+with Tefas() as tefas:
+    types = tefas.fetch_fund_types()
+    for t in types:
+        print(t.code, t.name)  # e.g. 104 "Hisse Senedi Şemsiye Fonu"
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | `int` | Numeric umbrella type code |
+| `name` | `str` | Umbrella type name |
+
+---
+
+### `Tefas.fetch_founders(fund_type: "YAT" | "EMK" = "YAT") -> list[Founder]`
+
+List founder institution codes and names. Pass the returned `code` values as `founder_code` in `fetch()`.
+
+```python
+from tefas_client import Tefas
+
+with Tefas() as tefas:
+    founders = tefas.fetch_founders()
+    for f in founders:
+        print(f.code, f.name)  # e.g. "IPO" "İŞ PORTFÖY YÖNETİMİ A.Ş."
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | `str` | Founder institution code |
+| `name` | `str` | Founder institution name |
+| `fund_type` | `str \| None` | Fund type indicator |
 
 **Returns:** `dict[str, Fund]` — mapping of fund code → fund data
 

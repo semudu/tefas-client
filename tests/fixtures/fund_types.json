@@ -1,0 +1,18 @@
+{
+  "errorCode": 0,
+  "errorMessage": null,
+  "resultList": [
+    {
+      "sfonTuru": 100,
+      "sfonTurAciklama": "Para Piyasası Şemsiye Fonu"
+    },
+    {
+      "sfonTuru": 104,
+      "sfonTurAciklama": "Hisse Senedi Şemsiye Fonu"
+    },
+    {
+      "sfonTuru": 106,
+      "sfonTurAciklama": "Altın ve Diğer Kıymetli Madenler Şemsiye Fonu"
+    }
+  ]
+}

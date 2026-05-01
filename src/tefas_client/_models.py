@@ -11,7 +11,7 @@ from typing import Any
 
 from pydantic import BaseModel, field_validator, model_validator
 
-from ._endpoints import AllocationRow, InfoRow
+from ._endpoints import AllocationRow, FundOverviewRow, FounderRow, FundTypeRow, InfoRow
 
 # ---------------------------------------------------------------------------
 # Asset-code → human-readable name mapping
@@ -173,3 +173,87 @@ class Fund(BaseModel):
     def latest(self) -> History:
         """Return the most recent History entry by date."""
         return max(self.history, key=lambda h: h.date)
+
+
+# ---------------------------------------------------------------------------
+# FundOverview
+# ---------------------------------------------------------------------------
+
+
+class FundOverview(BaseModel):
+    """Anlık fon özet bilgisi — fonBilgiGetir snapshot'ından türetilir.
+
+    History modelinden farklı olarak tarih içermez; bu veri API'den çekildiği
+    andaki son durumun anlık görüntüsüdür (zaman serisi değil).
+    """
+
+    code: str
+    title: str
+    price: float | None = None
+    daily_return: float | None = None
+    shares: int | None = None
+    market_cap: float | None = None
+    category: str | None = None
+    category_rank: int | None = None
+    category_fund_count: int | None = None
+    number_of_investors: int | None = None
+    market_share: float | None = None
+
+    model_config = {"frozen": True}
+
+    @classmethod
+    def from_row(cls, row: FundOverviewRow) -> "FundOverview":
+        return cls(
+            code=row.fonKodu.strip().upper(),
+            title=row.fonUnvan,
+            price=row.sonFiyat,
+            daily_return=row.gunlukGetiri,
+            shares=row.payAdet,
+            market_cap=row.portBuyukluk,
+            category=row.fonKategori,
+            category_rank=row.kategoriDerece,
+            category_fund_count=row.kategoriFonSay,
+            number_of_investors=row.yatirimciSayi,
+            market_share=row.pazarPayi,
+        )
+
+
+# ---------------------------------------------------------------------------
+# UmbrellaFundType
+# ---------------------------------------------------------------------------
+
+
+class UmbrellaFundType(BaseModel):
+    """Şemsiye fon türü — fonTurGetir'den türetilir."""
+
+    code: int
+    name: str
+
+    model_config = {"frozen": True}
+
+    @classmethod
+    def from_row(cls, row: FundTypeRow) -> "UmbrellaFundType":
+        return cls(code=row.sfonTuru, name=row.sfonTurAciklama)
+
+
+# ---------------------------------------------------------------------------
+# Founder
+# ---------------------------------------------------------------------------
+
+
+class Founder(BaseModel):
+    """Fon kurucu kurum — fonKurucuGetir'den türetilir."""
+
+    code: str
+    name: str
+    fund_type: str | None = None  # "F" (yatırım fonu) veya "M" (emeklilik)
+
+    model_config = {"frozen": True}
+
+    @classmethod
+    def from_row(cls, row: FounderRow) -> "Founder":
+        return cls(
+            code=row.kurucuKodu.strip().upper(),
+            name=row.kurucuUnvan,
+            fund_type=row.fonTipi,
+        )
