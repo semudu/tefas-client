@@ -7,7 +7,17 @@ from pathlib import Path
 
 import pytest
 
+import tefas_client._client as _tefas_client_module
+
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+
+@pytest.fixture(autouse=True)
+def no_sleep(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Patch time.sleep inside _client.py to a no-op so retry back-offs and jitter are instant."""
+    monkeypatch.setattr(
+        _tefas_client_module, "time", type("_T", (), {"sleep": staticmethod(lambda s: None)})()
+    )
 
 
 def load_fixture(name: str) -> dict:
