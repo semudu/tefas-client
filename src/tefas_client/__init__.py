@@ -8,7 +8,7 @@ Public API::
 
 from __future__ import annotations
 
-from ._models import Allocation, Founder, Fund, FundOverview, History, UmbrellaFundType
+from ._models import Allocation, Founder, Fund, FundDetails, FundOverview, History, UmbrellaFundType
 from ._tefas import FundType, Tefas
 from .exceptions import EmptyResponseError, RateLimitError, TefasError
 
@@ -21,6 +21,7 @@ __all__ = [
     "FundOverview",
     "UmbrellaFundType",
     "Founder",
+    "FundDetails",
     "TefasError",
     "RateLimitError",
     "EmptyResponseError",

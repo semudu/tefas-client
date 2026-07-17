@@ -23,6 +23,7 @@ ALLOCATION_URL = f"{BASE_URL}/api/funds/dagilimSiraliGetirT"
 FUND_OVERVIEW_URL = f"{BASE_URL}/api/funds/fonBilgiGetir"
 FUND_TYPES_URL = f"{BASE_URL}/api/funds/fonTurGetir"
 FUND_FOUNDERS_URL = f"{BASE_URL}/api/funds/fonKurucuGetir"
+FUND_PROFILE_URL = f"{BASE_URL}/api/funds/fonProfilBilgiGetir"
 
 # ---------------------------------------------------------------------------
 # Request body
@@ -188,3 +189,43 @@ class FounderRow(BaseModel):
     fonTipi: str | None = None
 
     model_config = {"extra": "allow", "populate_by_name": True}
+
+
+class FundProfileRow(BaseModel):
+    """One row from /api/funds/fonProfilBilgiGetir resultList — detailed fund metadata."""
+
+    fonKodu: str
+    fonUnvan: str
+    isinKodu: str | None = None
+    minAlis: float | None = None
+    minSatis: float | None = None
+    maxAlis: float | None = None
+    maxSatis: float | None = None
+    kapLink: str | None = None
+    tefasDurum: str | None = None
+    fonSatisValor: int | None = None
+    fonGeriAlisValor: int | None = None
+    riskDegeri: str | None = None
+
+    model_config = {"extra": "allow", "populate_by_name": True}
+
+    @field_validator("minAlis", "minSatis", "maxAlis", "maxSatis", mode="before")
+    @classmethod
+    def coerce_float(cls, v: Any) -> float | None:
+        if v is None or v == "":
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    @field_validator("fonSatisValor", "fonGeriAlisValor", mode="before")
+    @classmethod
+    def coerce_int(cls, v: Any) -> int | None:
+        if v is None or v == "":
+            return None
+        try:
+            return int(float(v))
+        except (TypeError, ValueError):
+            return None
+

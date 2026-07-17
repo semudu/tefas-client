@@ -41,16 +41,18 @@ from ._endpoints import (
     ALLOCATION_URL,
     FUND_FOUNDERS_URL,
     FUND_OVERVIEW_URL,
+    FUND_PROFILE_URL,
     FUND_TYPES_URL,
     INFO_URL,
     AllocationRow,
     FounderRow,
     FundOverviewRow,
+    FundProfileRow,
     FundTypeRow,
     InfoRow,
     RequestBody,
 )
-from ._models import Founder, Fund, FundOverview, History, UmbrellaFundType
+from ._models import Founder, Fund, FundDetails, FundOverview, History, UmbrellaFundType
 from ._utils import chunk_date_range, dedupe, nearest_weekday
 
 logger = logging.getLogger(__name__)
@@ -209,6 +211,26 @@ class Tefas:
 
         row = FundOverviewRow.model_validate(rows[0])
         return FundOverview.from_row(row)
+
+    def fetch_details(self, fund_code: str) -> FundDetails:
+        """Fetch detailed fund profile (ISIN, valor periods, min/max trade limits) (fonProfilBilgiGetir).
+
+        This reflects the current state at the time of the call.
+
+        Parameters
+        ----------
+        fund_code:
+            TEFAS fund code (e.g. ``"IPB"``).
+        """
+        body = RequestBody(fonKodu=fund_code.strip().upper(), dil=self._lang)
+        if self._client is not None:
+            rows = self._client.post(FUND_PROFILE_URL, body, raise_on_empty=True)
+        else:
+            with TefasHttpClient(timeout=self._timeout) as client:
+                rows = client.post(FUND_PROFILE_URL, body, raise_on_empty=True)
+
+        row = FundProfileRow.model_validate(rows[0])
+        return FundDetails.from_row(row)
 
     def fetch_fund_types(self, fund_type: FundType = "YAT", *, refresh: bool = False) -> list[UmbrellaFundType]:
         """List umbrella fund types (fonTurGetir).

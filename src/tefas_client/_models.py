@@ -11,7 +11,14 @@ from typing import Any
 
 from pydantic import BaseModel, field_validator, model_validator
 
-from ._endpoints import AllocationRow, FounderRow, FundOverviewRow, FundTypeRow, InfoRow
+from ._endpoints import (
+    AllocationRow,
+    FounderRow,
+    FundOverviewRow,
+    FundProfileRow,
+    FundTypeRow,
+    InfoRow,
+)
 
 # ---------------------------------------------------------------------------
 # Asset-code → human-readable name mapping
@@ -257,3 +264,48 @@ class Founder(BaseModel):
             name=row.kurucuUnvan,
             fund_type=row.fonTipi,
         )
+
+
+# ---------------------------------------------------------------------------
+# FundDetails
+# ---------------------------------------------------------------------------
+
+
+class FundDetails(BaseModel):
+    """Detaylı fon profil bilgileri — fonProfilBilgiGetir'den türetilir."""
+
+    code: str
+    title: str
+    isin_code: str | None = None
+    min_buy_amount: float | None = None
+    max_buy_amount: float | None = None
+    min_sell_amount: float | None = None
+    max_sell_amount: float | None = None
+    kap_link: str | None = None
+    tefas_status: str | None = None
+    buy_valor: int | None = None
+    sell_valor: int | None = None
+    risk_value: int | None = None
+
+    model_config = {"frozen": True}
+
+    @classmethod
+    def from_row(cls, row: FundProfileRow) -> FundDetails:
+        risk = None
+        if row.riskDegeri and str(row.riskDegeri).strip().isdigit():
+            risk = int(str(row.riskDegeri).strip())
+        return cls(
+            code=row.fonKodu.strip().upper(),
+            title=row.fonUnvan,
+            isin_code=row.isinKodu,
+            min_buy_amount=row.minAlis,
+            max_buy_amount=row.maxAlis,
+            min_sell_amount=row.minSatis,
+            max_sell_amount=row.maxSatis,
+            kap_link=row.kapLink,
+            tefas_status=row.tefasDurum,
+            buy_valor=row.fonSatisValor,
+            sell_valor=row.fonGeriAlisValor,
+            risk_value=risk,
+        )
+

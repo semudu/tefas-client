@@ -1,0 +1,25 @@
+{
+  "errorCode": 0,
+  "errorMessage": null,
+  "resultList": [
+    {
+      "fonKodu": "TLY",
+      "fonUnvan": "TERA PORTFÖY BİRİNCİ SERBEST FON",
+      "isinKodu": "TRYTRPY00025",
+      "sonIsSaat": "17:45",
+      "minAlis": 1.0,
+      "minSatis": 1.0,
+      "maxAlis": 999999999.0,
+      "maxSatis": 999999999.0,
+      "kapLink": "https://www.kap.org.tr/tr/fon-bilgileri/genel/tly-tera-portfoy-birinci-serbest-fon",
+      "tefasDurum": "TEFAS'ta işlem görüyor",
+      "cikisKomisyonu": null,
+      "girisKomisyonu": null,
+      "basIsSaat": "09:00",
+      "fonSatisValor": 2,
+      "fonGeriAlisValor": 1,
+      "faizIcerigi": null,
+      "riskDegeri": "7"
+    }
+  ]
+}

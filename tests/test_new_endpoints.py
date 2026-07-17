@@ -7,8 +7,14 @@ from pathlib import Path
 
 from pytest_httpx import HTTPXMock
 
-from tefas_client import Founder, FundOverview, Tefas, UmbrellaFundType
-from tefas_client._endpoints import FUND_FOUNDERS_URL, FUND_OVERVIEW_URL, FUND_TYPES_URL, INFO_URL
+from tefas_client import Founder, FundDetails, FundOverview, Tefas, UmbrellaFundType
+from tefas_client._endpoints import (
+    FUND_FOUNDERS_URL,
+    FUND_OVERVIEW_URL,
+    FUND_PROFILE_URL,
+    FUND_TYPES_URL,
+    INFO_URL,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -46,6 +52,32 @@ class TestFetchOverview:
             ov2 = tefas.fetch_overview("IPB")
         assert ov1.code == ov2.code == "IPB"
         assert len(httpx_mock.get_requests()) == 2
+
+
+class TestFetchDetails:
+    def test_returns_fund_details(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(url=FUND_PROFILE_URL, method="POST", json=_load("fund_profile.json"))
+        tefas = Tefas()
+        details = tefas.fetch_details("TLY")
+        assert isinstance(details, FundDetails)
+        assert details.code == "TLY"
+        assert details.title == "TERA PORTFÖY BİRİNCİ SERBEST FON"
+        assert details.isin_code == "TRYTRPY00025"
+        assert details.buy_valor == 2
+        assert details.sell_valor == 1
+        assert details.min_buy_amount == 1.0
+        assert details.max_buy_amount == 999999999.0
+        assert details.min_sell_amount == 1.0
+        assert details.max_sell_amount == 999999999.0
+        assert details.kap_link == "https://www.kap.org.tr/tr/fon-bilgileri/genel/tly-tera-portfoy-birinci-serbest-fon"
+        assert details.tefas_status == "TEFAS'ta işlem görüyor"
+        assert details.risk_value == 7
+
+    def test_fund_code_normalised_to_upper(self, httpx_mock: HTTPXMock):
+        httpx_mock.add_response(url=FUND_PROFILE_URL, method="POST", json=_load("fund_profile.json"))
+        tefas = Tefas()
+        details = tefas.fetch_details("tly")
+        assert details.code == "TLY"
 
 
 class TestFetchFundTypes:
