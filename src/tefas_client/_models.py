@@ -286,6 +286,11 @@ class FundDetails(BaseModel):
     buy_valor: int | None = None
     sell_valor: int | None = None
     risk_value: int | None = None
+    exit_commission: float | None = None
+    entry_commission: float | None = None
+    interest_content: str | None = None
+    start_time: str | None = None
+    end_time: str | None = None
 
     model_config = {"frozen": True}
 
@@ -307,5 +312,10 @@ class FundDetails(BaseModel):
             buy_valor=row.fonSatisValor,
             sell_valor=row.fonGeriAlisValor,
             risk_value=risk,
+            exit_commission=row.cikisKomisyonu,
+            entry_commission=row.girisKomisyonu,
+            interest_content=row.faizIcerigi,
+            start_time=row.basIsSaat,
+            end_time=row.sonIsSaat,
         )
 

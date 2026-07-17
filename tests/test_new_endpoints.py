@@ -72,6 +72,11 @@ class TestFetchDetails:
         assert details.kap_link == "https://www.kap.org.tr/tr/fon-bilgileri/genel/tly-tera-portfoy-birinci-serbest-fon"
         assert details.tefas_status == "TEFAS'ta işlem görüyor"
         assert details.risk_value == 7
+        assert details.exit_commission is None
+        assert details.entry_commission is None
+        assert details.interest_content is None
+        assert details.start_time == "09:00"
+        assert details.end_time == "17:45"
 
     def test_fund_code_normalised_to_upper(self, httpx_mock: HTTPXMock):
         httpx_mock.add_response(url=FUND_PROFILE_URL, method="POST", json=_load("fund_profile.json"))

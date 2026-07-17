@@ -206,10 +206,15 @@ class FundProfileRow(BaseModel):
     fonSatisValor: int | None = None
     fonGeriAlisValor: int | None = None
     riskDegeri: str | None = None
+    cikisKomisyonu: float | None = None
+    girisKomisyonu: float | None = None
+    faizIcerigi: str | None = None
+    basIsSaat: str | None = None
+    sonIsSaat: str | None = None
 
     model_config = {"extra": "allow", "populate_by_name": True}
 
-    @field_validator("minAlis", "minSatis", "maxAlis", "maxSatis", mode="before")
+    @field_validator("minAlis", "minSatis", "maxAlis", "maxSatis", "cikisKomisyonu", "girisKomisyonu", mode="before")
     @classmethod
     def coerce_float(cls, v: Any) -> float | None:
         if v is None or v == "":
